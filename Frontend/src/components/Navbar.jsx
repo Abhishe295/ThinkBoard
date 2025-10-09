@@ -80,10 +80,10 @@ const Navbar = () => {
       const { data } = await axios.post(backendUrl + '/api/auth/logout');
       if (data.success) {
         setIsLoggedin(false);
-        setUserData(false);
+        setUserData(null);
         useSocketStore.getState().disconnectSocket();
-        navigate('/');
-        window.location.reload();
+        navigate('/login');
+        // window.location.reload();
         setIsLoggedin(false);
       }
     } catch (error) {

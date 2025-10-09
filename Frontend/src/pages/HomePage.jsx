@@ -22,6 +22,8 @@ import {
   Clock,
   Loader2,
   BarChart3,
+  LoaderIcon,
+  Bot
   
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
@@ -35,7 +37,7 @@ const HomePage = () => {
   const [selectedMood, setSelectedMood] = useState('');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const {setUserData, userData, backendUrl } = useContext(AppContent);
+  const {setUserData, userData, backendUrl, setIsLoggedin } = useContext(AppContent);
   const [imageUrl, setImageUrl] = useState('');
   const [uploading, setUploading] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
@@ -279,15 +281,6 @@ React.useEffect(() => {
   return null;
 };
 
-const getISOWeekString = (date) => {
-  const tempDate = new Date(date.getTime());
-  tempDate.setHours(0, 0, 0, 0);
-  tempDate.setDate(tempDate.getDate() + 3 - ((tempDate.getDay() + 6) % 7));
-  const week1 = new Date(tempDate.getFullYear(), 0, 4);
-  const weekNumber = Math.ceil((((tempDate - week1) / 86400000) + ((week1.getDay() + 6) % 7) + 1) / 7);
-  return `${tempDate.getFullYear()}-W${weekNumber.toString().padStart(2, '0')}`;
-};
-
   
  const getWeekdayMap = (dailySummary = {}) => {
   const weekdayMap = {};
@@ -434,18 +427,8 @@ const getISOWeekString = (date) => {
     )
 }
 
-const emotionCategories = {
-  stress: ['anxious', 'worried', 'tense'],
-  mood: ['happy', 'joy', 'excited', 'content', 'neutral'],
-  sleep: ['tired', 'restless'],
-  productivity: ['focused', 'motivated'],
-  social: ['lonely', 'connected'],
-};
-
 
   const weekdayMap = getWeekdayMap(historyData?.daily_summary)
-  
-  console.log("Weekly weekday map:", weekdayMap);
   const chartData = generateChartData(historyData.daily_summary);
   const weeklyEmotion = historyData.weekly_summary
   ? normalizeEmotion(getLatestEmotion(historyData.weekly_summary))
@@ -453,9 +436,6 @@ const emotionCategories = {
   const monthlyEmotion = historyData?.monthly_summary
   ? normalizeEmotion(getLatestEmotion(historyData?.monthly_summary))
   : null;
-
-  console.log("weekly_summary keys:", Object.keys(historyData?.weekly_summary || {}));
- 
   const recentEmotion = historyData?.daily_summary
   ? normalizeEmotion(getMostRecentEmotion(historyData.daily_summary))
   : null;
@@ -478,9 +458,9 @@ const emotionCategories = {
             <button className="btn btn-circle btn-primary">
               <Home className="w-6 h-6" />
             </button>
-            <button className="btn btn-circle btn-ghost">
-              <TrendingUp className="w-6 h-6" />
-            </button>
+            <Link to='/AI' className="btn btn-circle btn-ghost">
+              <Bot className="w-6 h-6" />
+            </Link>
             <Link to='/chat' className="btn btn-circle btn-ghost">
               <MessageCircle className="w-6 h-6" />
             </Link>
@@ -587,8 +567,8 @@ const emotionCategories = {
             </section>
 
             {/* Weekly Mood Tracker */}
-            <div className="card bg-base-100 shadow-xl">
-                      <div className="card-body">
+            <div className="card bg-base-100 shadow-xl mb-3">
+                      <div className="card-body ">
                         <h3 className="card-title text-xl mb-4 flex items-center gap-2">
                           <History className="w-5 h-5" />
                           Mood History

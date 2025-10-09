@@ -1,7 +1,9 @@
-import React, { useContext, useState, useRef } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { AppContent } from "../context/AppContext";
 import { Camera, Mic, FileText, Play, Square, AlertCircle, CheckCircle, Loader2, TrendingUp, Calendar, BarChart3, History } from "lucide-react";
+import Navbar from "../components/Navbar";
+// import VoiceRecognitionPage from "../components/VoiceReco";
 
 const PHQ9_ITEMS = [
   "Little interest or pleasure in doing things.",
@@ -127,6 +129,7 @@ const EmotionDetectPage = () => {
   // recording refs
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+  const videoRef = useRef(null);
 
   // form states
   const [phq9, setPhq9] = useState(Array(PHQ9_ITEMS.length).fill(0));
@@ -166,33 +169,56 @@ const EmotionDetectPage = () => {
   // -------------------------
   // Camera Detection
   // -------------------------
-  const handleCameraDetect = async () => {
-    if (!userData || !userData._id) {
-      setResult({ error: "Please log in first." });
-      return;
-    }
+  const handleCameraDetect = () => {
+  if (!userData || !userData._id) {
+    setResult({ error: "Please log in first." });
+    return;
+  }
 
-    setLoading(true);
-    setActiveMethod('camera');
-    setResult(null);
-    
+  setResult(null);           // Clear previous result
+  setLoading(true);          // Show loading spinner
+  setActiveMethod('camera'); // Trigger popup and useEffect
+};
+
+useEffect(() => {
+  const startCamera = async () => {
+    if (activeMethod !== 'camera' || !videoRef.current) return;
+
     try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      videoRef.current.srcObject = stream;
+
+      // Now trigger backend detection
       const res = await axios.post(
         `${backendUrl}/api/emotion/camera`,
         { userId: userData._id },
         { headers: { "Content-Type": "application/json" } }
       );
       setResult(res.data);
-      // Refresh history after new emotion is recorded
       fetchEmotionHistory();
-    } catch (error) {
-      console.error("Camera detection error:", error);
-      setResult({ error: "Camera detection failed. Please try again." });
+    } catch (err) {
+      console.error("Camera detection error:", err);
+      setResult({ error: "Camera detection failed." });
     } finally {
+      stopCamera();
       setLoading(false);
       setActiveMethod(null);
     }
   };
+
+  startCamera();
+}, [activeMethod]);
+
+//Stop the camera
+
+const stopCamera = () => {
+  const stream = videoRef.current?.srcObject;
+
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+    videoRef.current.srcObject = null;
+  }
+};
 
   // -------------------------
   // Voice Recording
@@ -709,10 +735,10 @@ const EmotionDetectPage = () => {
 
   return (
     <div className="min-h-screen bg-base-200 p-4 lg:p-8">
-      <div className="max-w-7xl mx-auto">
+      <Navbar/>
+      <div className="max-w-7xl mx-auto mt-14">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-base-content mb-2">Emotion Detection</h1>
           <p className="text-base-content/70 text-lg">Choose your preferred method for emotion analysis</p>
         </div>
 
@@ -746,6 +772,23 @@ const EmotionDetectPage = () => {
               </div>
             </div>
           </div>
+          {/* Camera Popup */}
+{activeMethod === 'camera' && (
+  <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
+    <div className="bg-base-100 rounded-lg p-4 relative w-[320px] shadow-xl">
+      <video ref = {videoRef} autoPlay playsInline className="rounded-md w-full" />
+      <button
+        onClick={() => stopCamera()}
+        className="absolute top-2 right-2 btn btn-sm btn-error"
+      >
+        ✕
+      </button>
+      <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded">
+        Detecting...
+      </div>
+    </div>
+  </div>
+)}
 
           {/* Voice Detection */}
           <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300">
@@ -782,7 +825,7 @@ const EmotionDetectPage = () => {
               </div>
             </div>
           </div>
-
+          {/* <VoiceRecognitionPage/> */}
           {/* Form Assessment */}
           <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300">
             <div className="card-body text-center">

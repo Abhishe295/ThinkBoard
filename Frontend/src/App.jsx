@@ -25,10 +25,14 @@ const App = () => {
   const navigate = useNavigate();
   const {isLoggedin, authLoading} = useContext(AppContent) 
   useEffect(() => {
-  if (!authLoading && isLoggedin && window.location.pathname === '/login') {
-    navigate('/');
+  if (!authLoading) {
+    if (!isLoggedin && window.location.pathname !== '/login') {
+      navigate('/login');
+    } else if (isLoggedin && window.location.pathname === '/login') {
+      navigate('/');
+    }
   }
-}, [authLoading, isLoggedin]);
+}, [authLoading, isLoggedin, navigate]);
   return (
     
 
