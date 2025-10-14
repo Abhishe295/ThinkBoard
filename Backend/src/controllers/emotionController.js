@@ -6,31 +6,87 @@ import cloudinary from '../config/cloudinary.js';
 import multer from 'multer';
 import moment from 'moment';
 import _ from 'lodash';
+import path from 'path';
 
 
 
-export const detectEmotionCamera= async(req,res)=>{
-    try {
-        const { userId } = req.body;
-        const response = await axios.post(process.env.PYTHON_API + '/detect-emotion/camera',{user_id : userId});
-        console.log(response.data);
+// export const detectEmotionCamera= async(req,res)=>{
+//     try {
+//         const { userId } = req.body;
+//         const response = await axios.post(process.env.PYTHON_API + '/detect-emotion/camera',{user_id : userId});
+//         console.log(response.data);
 
-        const data = response.data;
-        await userModel.findByIdAndUpdate(userId, {$push: {emotionHistory: data.history[data.history.length-1]}
-        });
+//         const data = response.data;
+//         await userModel.findByIdAndUpdate(userId, {$push: {emotionHistory: data.history[data.history.length-1]}
+//         });
 
-        res.json(data);
-    } catch (err) {
-        console.error("Camera detection error:", err.response?.data || err.message);
-  res.status(500).json({
-    error: err.message,
-    details: err.response?.data, // show Python error
-  });
+//         res.json(data);
+//     } catch (err) {
+//         console.error("Camera detection error:", err.response?.data || err.message);
+//   res.status(500).json({
+//     error: err.message,
+//     details: err.response?.data, // show Python error
+//   });
         
+//     }
+// };
+const upload = multer({ dest: "uploads/"});
+
+const ensureDirectoryExists = (dirPath) => {
+  if(!fs.existsSync(dirPath)){
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+}
+
+export const detectEmotionFromImage = async (req, res) => {
+  try {
+    const { user_id } = req.body;
+    const imageUrl = req.file?.path; // this is a Cloudinary URL
+
+    if (!imageUrl) {
+      return res.status(400).json({ error: "No image uploaded" });
     }
+
+    const folderPath = path.join('uploads','user_profiles');
+    ensureDirectoryExists(folderPath);
+
+    // Download image from Cloudinary
+    const tempPath = path.join('uploads', `${req.file.filename}.jpg`);
+    const response = await axios.get(imageUrl, { responseType: 'stream' });
+    const writer = fs.createWriteStream(tempPath);
+    response.data.pipe(writer);
+
+    await new Promise((resolve, reject) => {
+      writer.on('finish', resolve);
+      writer.on('error', reject);
+    });
+
+    // Prepare formData for Python
+    const formData = new FormData();
+    formData.append('user_id', user_id);
+    formData.append('file', fs.createReadStream(tempPath));
+
+    const pythonResponse = await axios.post(
+      process.env.PYTHON_API + '/detect-emotion/image',
+      formData,
+      { headers: formData.getHeaders() }
+    );
+
+    // Cleanup
+    try {
+      fs.unlinkSync(tempPath);
+    } catch (e) {
+      console.warn("Temp file cleanup failed:", e.message);
+    }
+
+    res.json(pythonResponse.data);
+  } catch (err) {
+    console.error("Image detection error:", err.response?.data || err.message);
+    res.status(500).json({ error: "Image detection failed" });
+  }
 };
 
-const upload = multer({ dest: "uploads/"});
+
 export const detectEmotionVoice = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: "No file uploaded" });

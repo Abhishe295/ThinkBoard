@@ -169,53 +169,142 @@ const EmotionDetectPage = () => {
   // -------------------------
   // Camera Detection
   // -------------------------
-  const handleCameraDetect = () => {
+// const handleCameraDetect = async () => {
+//   if (!userData || !userData._id) {
+//     setResult({ error: "Please log in first." });
+//     return;
+//   }
+
+//   setResult(null);
+//   setLoading(true);
+//   setActiveMethod('camera');
+
+//   try {
+//     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+//     videoRef.current.srcObject = stream;
+
+//     // Wait for video to load
+//     await new Promise(resolve => setTimeout(resolve, 1000));
+
+//     // Capture image from video
+//     const canvas = document.createElement('canvas');
+//     canvas.width = videoRef.current.videoWidth;
+//     canvas.height = videoRef.current.videoHeight;
+//     canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
+
+//     const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
+//     const formData = new FormData();
+//     formData.append('user_id', userData._id);
+//     formData.append('image', blob, 'snapshot.jpg');
+
+//     const res = await axios.post(`${backendUrl}/api/emotion/camera-image`, formData);
+//     setResult(res.data);
+//     fetchEmotionHistory();
+//   } catch (err) {
+//     console.error("Camera detection error:", err);
+//     setResult({ error: "Camera detection failed." });
+//   } finally {
+//     stopCamera();
+//     setLoading(false);
+//     setActiveMethod(null);
+//   }
+// };
+
+// useEffect(() => {
+//   const startCamera = async () => {
+//     if (activeMethod !== 'camera' || !videoRef.current) return;
+
+//     try {
+//       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+//       videoRef.current.srcObject = stream;
+
+//       // Now trigger backend detection
+//       const res = await axios.post(
+//         `${backendUrl}/api/emotion/camera`,
+//         { userId: userData._id },
+//         { headers: { "Content-Type": "application/json" } }
+//       );
+//       setResult(res.data);
+//       fetchEmotionHistory();
+//     } catch (err) {
+//       console.error("Camera detection error:", err);
+//       setResult({ error: "Camera detection failed." });
+//     } finally {
+//       stopCamera();
+//       setLoading(false);
+//       setActiveMethod(null);
+//     }
+//   };
+
+//   startCamera();
+// }, [activeMethod]);
+
+//Stop the camera
+
+// const stopCamera = () => {
+//   const stream = videoRef.current?.srcObject;
+
+//   if (stream) {
+//     stream.getTracks().forEach(track => track.stop());
+//     videoRef.current.srcObject = null;
+//   }
+// };
+
+const startCameraStream = async () => {
+  const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  if (videoRef.current) {
+    videoRef.current.srcObject = stream;
+  }
+  return stream;
+};
+
+const captureSnapshot = () => {
+  const canvas = document.createElement('canvas');
+  canvas.width = videoRef.current.videoWidth;
+  canvas.height = videoRef.current.videoHeight;
+  canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
+  return new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
+};
+
+const handleCameraDetect = async () => {
   if (!userData || !userData._id) {
     setResult({ error: "Please log in first." });
     return;
   }
 
-  setResult(null);           // Clear previous result
-  setLoading(true);          // Show loading spinner
-  setActiveMethod('camera'); // Trigger popup and useEffect
+  setResult(null);
+  setLoading(true);
+  setActiveMethod('camera');
+
+  try {
+    const stream = await startCameraStream();
+
+    // Wait for video to stabilize
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    const blob = await captureSnapshot();
+    const formData = new FormData();
+    formData.append('user_id', userData._id);
+    formData.append('image', blob, 'snapshot.jpg');
+
+    const res = await axios.post(`${backendUrl}/api/emotion/camera-image`, formData);
+    setResult(res.data);
+    fetchEmotionHistory();
+
+    stopCamera(stream);
+  } catch (err) {
+    console.error("Camera detection error:", err);
+    setResult({ error: "Camera detection failed." });
+  } finally {
+    setLoading(false);
+    setActiveMethod(null);
+  }
 };
 
-useEffect(() => {
-  const startCamera = async () => {
-    if (activeMethod !== 'camera' || !videoRef.current) return;
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      videoRef.current.srcObject = stream;
-
-      // Now trigger backend detection
-      const res = await axios.post(
-        `${backendUrl}/api/emotion/camera`,
-        { userId: userData._id },
-        { headers: { "Content-Type": "application/json" } }
-      );
-      setResult(res.data);
-      fetchEmotionHistory();
-    } catch (err) {
-      console.error("Camera detection error:", err);
-      setResult({ error: "Camera detection failed." });
-    } finally {
-      stopCamera();
-      setLoading(false);
-      setActiveMethod(null);
-    }
-  };
-
-  startCamera();
-}, [activeMethod]);
-
-//Stop the camera
-
-const stopCamera = () => {
-  const stream = videoRef.current?.srcObject;
-
-  if (stream) {
-    stream.getTracks().forEach(track => track.stop());
+const stopCamera = (stream) => {
+  if (!stream) return;
+  stream.getTracks().forEach(track => track.stop());
+  if (videoRef.current) {
     videoRef.current.srcObject = null;
   }
 };
