@@ -30,6 +30,10 @@ import path from 'path';
         
 //     }
 // };
+
+const isProduction = process.env.NODE_ENV === 'production';
+
+const PYTHON_API = isProduction ? process.env.PYTHON_API_PROD : process.env.PYTHON_API_DEV;
 const upload = multer({ dest: "uploads/"});
 
 const ensureDirectoryExists = (dirPath) => {
@@ -67,7 +71,7 @@ export const detectEmotionFromImage = async (req, res) => {
     formData.append('file', fs.createReadStream(tempPath));
 
     const pythonResponse = await axios.post(
-      process.env.PYTHON_API + '/detect-emotion/image',
+      PYTHON_API + '/detect-emotion/image',
       formData,
       { headers: formData.getHeaders() }
     );
@@ -112,14 +116,14 @@ export const detectEmotionVoice = async (req, res) => {
     headers["Content-Length"] = contentLength;
 
     console.log("Sending to Python API:", {
-  url: process.env.PYTHON_API + "/detect-emotion/voice",
+  url: PYTHON_API + "/detect-emotion/voice",
   userId,
   filePath: req.file.path
 });
 
 
     const response = await axios.post(
-      process.env.PYTHON_API + "/detect-emotion/voice",
+      PYTHON_API + "/detect-emotion/voice",
       formData,
       { headers }
     );
@@ -151,7 +155,7 @@ export const detectEmotionForm = async (req, res) => {
       return res.status(400).json({ error: "phq9 and gad7 must be arrays of numbers" });
     }
 
-    const response = await axios.post(process.env.PYTHON_API + "/detect-emotion/form", {
+    const response = await axios.post(PYTHON_API + "/detect-emotion/form", {
       user_id: user_id,
       phq9,
       gad7

@@ -64,6 +64,8 @@ class FormRequest(BaseModel):
 
 #     return {"user_id": user_id, "detected_emotion": detected_emotion, "history": user_emotion_history[user_id]}
 
+
+
 @app.post("/detect-emotion/image")
 async def detect_emotion_image(user_id: str = Form(...), file: UploadFile = File(...)):
     contents = await file.read()
