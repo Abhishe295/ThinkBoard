@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+numpy
+librosa
+opencv-python-headless
+python-multipart
