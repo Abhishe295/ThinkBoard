@@ -252,7 +252,7 @@ React.useEffect(() => {
     try {
       const res = await axios.get(`${backendUrl}/api/emotion/history/${userData._id}`);
       const data = res.data;
-      // console.log("Fetched emotion history:", data);
+      console.log("Fetched emotion history:", data);
 
       if (!data.message) {
         setHistoryData(data);
@@ -287,7 +287,7 @@ React.useEffect(() => {
   const weekdayMap = {};
   const today = new Date();
 
-  // console.log("dailySummary keys:", Object.keys(dailySummary)); // 👈 debug
+  console.log("dailySummary keys:", Object.keys(dailySummary)); // 👈 debug
 
   for (let i = 6; i >= 0; i--) {
     const date = new Date(today);
@@ -589,7 +589,7 @@ React.useEffect(() => {
           </aside>
 
           {/* Main Content - RESPONSIVE */}
-          <main className="flex-1 lg:col-span-6 overflow-y-auto scrollbar scrollbar-none p-3 md:p-4 lg:p-6 no-scrollbar w-full ml-16 md:ml-20 lg:ml-0">
+          <main className="flex-1 lg:col-span-6 overflow-y-auto scrollbar scrollbar-none p-1 md:p-4 no-scrollbar w-full ml-16 md:ml-20 lg:ml-0">
             {/* Category Filters - RESPONSIVE */}
             <section className="flex gap-2 mb-4 md:mb-6 overflow-x-auto no-scrollbar pb-2">
               <button className="btn btn-primary btn-xs md:btn-sm whitespace-nowrap">All</button>
@@ -638,7 +638,7 @@ React.useEffect(() => {
                     </div>
             
 
-            <div className="space-y-3 md:space-y-4 max-w-6xl mx-auto">
+            <div className="space-y-3 md:space-y-4">
   {/* Top Row - Bar Chart - RESPONSIVE */}
   <div className="w-full">
     <div className="card bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 shadow-xl border border-base-300/20">
@@ -697,9 +697,9 @@ React.useEffect(() => {
   </div>
 
   {/* Bottom Row - Trend Chart and Suggestions Side by Side - RESPONSIVE */}
-  <div className="flex flex-col lg:flex-row gap-3 md:gap-4">
+  <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 md:gap-4">
     {/* Trend Line Chart - Takes up 60% on large screens - RESPONSIVE */}
-    <div className="flex-1 lg:flex-[3]">
+    <div className="lg:col-span-3">
       <div className="card bg-gradient-to-br from-secondary/10 via-accent/5 to-primary/10 shadow-xl border border-base-300/20">
         <div className="card-body p-3 md:p-4">
           <div className="flex items-center justify-between mb-3">
@@ -794,13 +794,13 @@ React.useEffect(() => {
     </div>
 
     {/* Recent Emotion Suggestions - Takes up 40% on large screens - RESPONSIVE */}
-    <div className="flex-1 lg:flex-[2]">
+    <div className="lg:col-span-2">
       {recentEmotion && (
-        <div className={`card bg-gradient-to-r ${getEmotionSuggestions(recentEmotion)?.color} shadow-xl`}>
+        <div className={`card bg-gradient-to-r ${getEmotionSuggestions(recentEmotion)?.color} shadow-xl h-full`}>
           <div className="card-body p-3 md:p-4">
             <h2 className="card-title text-sm md:text-base lg:text-lg mb-3 flex items-center gap-2">
               <span className="text-lg md:text-xl">{getEmotionEmoji(recentEmotion)}</span>
-              <span className="truncate">{getEmotionSuggestions(recentEmotion)?.title}</span>
+              <span className="truncate text-sm md:text-base">{getEmotionSuggestions(recentEmotion)?.title}</span>
             </h2>
             
             <div className="space-y-2">
