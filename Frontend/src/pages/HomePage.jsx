@@ -252,7 +252,7 @@ React.useEffect(() => {
     try {
       const res = await axios.get(`${backendUrl}/api/emotion/history/${userData._id}`);
       const data = res.data;
-      console.log("Fetched emotion history:", data);
+      // console.log("Fetched emotion history:", data);
 
       if (!data.message) {
         setHistoryData(data);
@@ -287,7 +287,7 @@ React.useEffect(() => {
   const weekdayMap = {};
   const today = new Date();
 
-  console.log("dailySummary keys:", Object.keys(dailySummary)); // 👈 debug
+  // console.log("dailySummary keys:", Object.keys(dailySummary)); // 👈 debug
 
   for (let i = 6; i >= 0; i--) {
     const date = new Date(today);
