@@ -48,6 +48,7 @@ const CallPage = () => {
   const [isAccepting, setIsAccepting] = useState(false);
   const [callStatus, setCallStatus] = useState("connecting");
   const [callDuration, setCallDuration] = useState(0);
+  const [remoteHasVideo, setRemoteHasVideo] = useState(false);
 
   // -------------------- Helpers --------------------
 
@@ -66,7 +67,7 @@ const CallPage = () => {
 
       // mic analyzer (keeps running)
       try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        const AudioCtx = window.AudioContext || window.AudioContext;
         const audioContext = new AudioCtx();
         const source = audioContext.createMediaStreamSource(stream);
         const analyser = audioContext.createAnalyser();
@@ -124,24 +125,49 @@ const CallPage = () => {
     if (remoteVideoRef.current) remoteVideoRef.current.srcObject = remoteStreamRef.current;
     if (remoteAudioRef.current) remoteAudioRef.current.srcObject = remoteStreamRef.current;
 
+    // pcRef.current.ontrack = (event) => {
+    //   // attach tracks to the remote MediaStream
+    //   try {
+    //     const [stream] = event.streams;
+    //     if (stream) {
+    //       stream.getTracks().forEach((t) => {
+    //         remoteStreamRef.current.addTrack(t);
+    //       });
+    //     } else {
+    //       event.track && remoteStreamRef.current.addTrack(event.track);
+    //     }
+    //     // ensure elements are updated
+    //     if (remoteVideoRef.current) remoteVideoRef.current.srcObject = remoteStreamRef.current;
+    //     if (remoteAudioRef.current) remoteAudioRef.current.srcObject = remoteStreamRef.current;
+    //   } catch (e) {
+    //     console.warn("ontrack error", e);
+    //   }
+    // };
+
     pcRef.current.ontrack = (event) => {
-      // attach tracks to the remote MediaStream
-      try {
-        const [stream] = event.streams;
-        if (stream) {
-          stream.getTracks().forEach((t) => {
-            remoteStreamRef.current.addTrack(t);
-          });
-        } else {
-          event.track && remoteStreamRef.current.addTrack(event.track);
-        }
-        // ensure elements are updated
-        if (remoteVideoRef.current) remoteVideoRef.current.srcObject = remoteStreamRef.current;
-        if (remoteAudioRef.current) remoteAudioRef.current.srcObject = remoteStreamRef.current;
-      } catch (e) {
-        console.warn("ontrack error", e);
-      }
-    };
+  const [stream] = event.streams;
+
+  if (stream) {
+    console.log("🎥 Remote stream received:", stream);
+    remoteStreamRef.current = stream;
+
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = stream;
+    }
+
+    // Reactively mark video as on/off
+    const hasVideo = stream.getVideoTracks().some((track) => track.readyState === "live");
+    setRemoteHasVideo(hasVideo);
+
+    // Listen for later changes (like camera toggle)
+    stream.getVideoTracks().forEach((track) => {
+      track.onended = () => setRemoteHasVideo(false);
+      track.onmute = () => setRemoteHasVideo(false);
+      track.onunmute = () => setRemoteHasVideo(true);
+    });
+  }
+};
+
 
     pcRef.current.onicecandidate = (evt) => {
       if (evt.candidate && peerId) {
@@ -424,18 +450,19 @@ const CallPage = () => {
               <div className="absolute top-4 left-4">
                 <div className="badge badge-neutral">Remote</div>
               </div>
-              {!remoteStreamRef.current?.getVideoTracks?.()[0]?.enabled && (
-                <div className="absolute inset-0 bg-neutral flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="avatar placeholder mb-2">
-                      <div className="bg-neutral-focus text-neutral-content rounded-full w-20">
-                        <User size={40} />
-                      </div>
-                    </div>
-                    <p className="text-neutral-content">Camera is off</p>
-                  </div>
-                </div>
-              )}
+              {!remoteHasVideo && (
+  <div className="absolute inset-0 bg-neutral flex items-center justify-center">
+    <div className="text-center">
+      <div className="avatar placeholder mb-2">
+        <div className="bg-neutral-focus text-neutral-content rounded-full w-20">
+          <User size={40} />
+        </div>
+      </div>
+      <p className="text-neutral-content">Camera is off</p>
+    </div>
+  </div>
+)}
+
             </div>
 
             <div className="absolute top-4 right-4 w-32 h-48 lg:relative lg:top-0 lg:right-0 lg:w-full lg:h-full bg-base-300 rounded-lg lg:rounded-none overflow-hidden shadow-lg lg:shadow-none z-10">

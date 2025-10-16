@@ -36,6 +36,7 @@ import { Link } from 'react-router';
 const HomePage = () => {
   const [selectedMood, setSelectedMood] = useState('');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false); // Added for mobile right sidebar
   const [currentDate, setCurrentDate] = useState(new Date());
   const {setUserData, userData, backendUrl, setIsLoggedin } = useContext(AppContent);
   const [imageUrl, setImageUrl] = useState('');
@@ -452,54 +453,88 @@ React.useEffect(() => {
           />
         )}
 
-        {/* Left Mini Sidebar */}
-        <nav className="w-20 bg-base-200 shadow-lg flex flex-col items-center py-6 fixed left-0 top-0 h-full z-30">
-          <div className="flex flex-col space-y-5 flex-grow">
-            <button className="btn btn-circle btn-primary">
-              <Home className="w-6 h-6" />
+        {/* Mobile Right Sidebar Overlay */}
+        {isRightSidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+            onClick={() => setIsRightSidebarOpen(false)}
+          />
+        )}
+
+        {/* Left Mini Sidebar - RESPONSIVE */}
+        <nav className="w-16 md:w-20 bg-base-200 shadow-lg flex flex-col items-center py-4 md:py-6 fixed left-0 top-0 h-full z-30">
+          <div className="flex flex-col space-y-3 md:space-y-5 flex-grow">
+            <button className="btn btn-circle btn-primary btn-sm md:btn-md">
+              <Home className="w-4 h-4 md:w-6 md:h-6" />
             </button>
-            <Link to='/AI' className="btn btn-circle btn-ghost">
-              <Bot className="w-6 h-6" />
+            <Link to='/AI' className="btn btn-circle btn-ghost btn-sm md:btn-md">
+              <Bot className="w-4 h-4 md:w-6 md:h-6" />
             </Link>
-            <Link to='/chat' className="btn btn-circle btn-ghost">
-              <MessageCircle className="w-6 h-6" />
+            <Link to='/chat' className="btn btn-circle btn-ghost btn-sm md:btn-md">
+              <MessageCircle className="w-4 h-4 md:w-6 md:h-6" />
             </Link>
           </div>
-          <div className="flex flex-col space-y-5 mt-auto">
-            <button className="btn btn-circle btn-ghost">
-              <HelpCircle className="w-6 h-6" />
+          <div className="flex flex-col space-y-3 md:space-y-5 mt-auto">
+            <button className="btn btn-circle btn-ghost btn-sm md:btn-md">
+              <HelpCircle className="w-4 h-4 md:w-6 md:h-6" />
             </button>
-            <button onClick={logout} className="btn btn-circle btn-ghost">
-              {logoutLoading ? <LoaderIcon className="animate-spin w-4 h-4" />: <LogOut className="w-6 h-6" />}
+            <button onClick={logout} className="btn btn-circle btn-ghost btn-sm md:btn-md">
+              {logoutLoading ? <LoaderIcon className="animate-spin w-3 h-3 md:w-4 md:h-4" />: <LogOut className="w-4 h-4 md:w-6 md:h-6" />}
             </button>
           </div>
         </nav>
 
-        {/* Top Navbar */}
-        <Navbar/>
+        {/* Top Navbar - RESPONSIVE */}
+        <div className="fixed top-0 left-16 md:left-20 right-0 z-20 bg-base-200 shadow-lg lg:hidden">
+          <div className="navbar px-2 md:px-4">
+            <div className="flex-1">
+              <button 
+                className="btn btn-ghost btn-circle btn-sm md:btn-md"
+                onClick={() => setIsMobileSidebarOpen(true)}
+              >
+                <Menu className="w-5 h-5 md:w-6 md:h-6" />
+              </button>
+              <h1 className="text-base md:text-xl font-bold ml-2">MindWell</h1>
+            </div>
+            <div className="flex-none gap-1 md:gap-2">
+              <button className="btn btn-ghost btn-circle btn-sm md:btn-md">
+                <Bell className="w-4 h-4 md:w-5 md:h-5" />
+              </button>
+              <button 
+                className="btn btn-ghost btn-circle btn-sm md:btn-md"
+                onClick={() => setIsRightSidebarOpen(true)}
+              >
+                <CalendarDays className="w-4 h-4 md:w-5 md:h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="hidden lg:block">
+          <Navbar/>
+        </div>
 
-        <div className=" pt-20 ml-20 w-full grid grid-cols-12 gap-6">
-          {/* Expanded Sidebar */}
-          <aside className={` col-span-3 bg-base-200 shadow-lg p-6 overflow-y-auto no-scrollbar transition-transform duration-300 ${
-            isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-          } fixed lg:static top-0 left-20 h-full z-40 lg:z-auto`}>
+        <div className="pt-16 md:pt-20 ml-0 lg:ml-20 w-full flex lg:grid lg:grid-cols-12 lg:gap-6">
+          {/* Expanded Sidebar - RESPONSIVE */}
+          <aside className={`w-64 md:w-72 bg-base-200 shadow-lg p-4 md:p-6 overflow-y-auto no-scrollbar transition-transform duration-300 ${
+            isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          } lg:translate-x-0 fixed lg:static top-0 left-0 lg:left-20 bottom-0 z-40 lg:z-auto lg:col-span-3`}>
             
             <div className="lg:hidden flex justify-end mb-4">
               <button 
-                className="btn btn-circle btn-ghost"
+                className="btn btn-circle btn-ghost btn-sm"
                 onClick={() => setIsMobileSidebarOpen(false)}
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5 md:w-6 md:h-6" />
               </button>
             </div>
 
-            {/* User Profile */}
+            {/* User Profile - RESPONSIVE */}
             <div className="text-center mb-6">
       <div className="avatar mb-3">
-        <div className="w-24 rounded-full overflow-hidden">
-          <div className="bg-primary text-primary-content w-full h-full flex items-center justify-center text-2xl font-bold">
+        <div className="w-20 md:w-24 rounded-full overflow-hidden">
+          <div className="bg-primary text-primary-content w-full h-full flex items-center justify-center text-xl md:text-2xl font-bold">
             {uploading ? (
-              <LoaderIcon className="animate-spin w-6 h-6" />
+              <LoaderIcon className="animate-spin w-5 h-5 md:w-6 md:h-6" />
             ) : imageUrl ? (
               <img src={imageUrl} alt="Profile" className="w-full h-full object-cover" />
             ) : (
@@ -508,12 +543,12 @@ React.useEffect(() => {
           </div>
         </div>
       </div>
-      <h3 className="font-semibold text-xl">
+      <h3 className="font-semibold text-lg md:text-xl">
         {userData?.name || 'Guest'}
       </h3>
     </div>
             <section className="mb-6">
-                <h3 className="text-lg font-semibold text-primary mb-3">Emotion Summary</h3>
+                <h3 className="text-base md:text-lg font-semibold text-primary mb-3">Emotion Summary</h3>
                     <div className="grid grid-cols-2 gap-3">
                         <div className="flex flex-col items-center bg-base-200 rounded-lg p-2">
                             <span className="text-2xl">{getEmotionEmoji(weeklyEmotion)}</span>
@@ -528,53 +563,53 @@ React.useEffect(() => {
                     </div>
             </section>
 
-            {/* Exercises */}
+            {/* Exercises - RESPONSIVE */}
             <section className="mb-6">
-              <h3 className="text-lg font-semibold text-primary mb-3">Exercise for You</h3>
-              <div className="grid grid-cols-2 gap-4">
+              <h3 className="text-base md:text-lg font-semibold text-primary mb-3">Exercise for You</h3>
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 {[
-                  { icon: <Wind className="w-6 h-6 text-primary" />, title: "Breathing Exercise", desc: "5 min guided session" },
-                  { icon: <Flower2 className="w-6 h-6 text-primary" />, title: "Mindfulness", desc: "10 min meditation" },
-                  { icon: <Music className="w-6 h-6 text-primary" />, title: "Sound Therapy", desc: "Calm playlist" },
-                  { icon: <BookOpen className="w-6 h-6 text-primary" />, title: "Journaling", desc: "Express feelings" },
+                  { icon: <Wind className="w-5 h-5 md:w-6 md:h-6 text-primary" />, title: "Breathing Exercise", desc: "5 min guided session" },
+                  { icon: <Flower2 className="w-5 h-5 md:w-6 md:h-6 text-primary" />, title: "Mindfulness", desc: "10 min meditation" },
+                  { icon: <Music className="w-5 h-5 md:w-6 md:h-6 text-primary" />, title: "Sound Therapy", desc: "Calm playlist" },
+                  { icon: <BookOpen className="w-5 h-5 md:w-6 md:h-6 text-primary" />, title: "Journaling", desc: "Express feelings" },
                 ].map((ex, idx) => (
                   <div key={idx} className="card bg-base-200 shadow-md hover:shadow-xl border border-base-300">
-                    <div className="card-body p-4">
+                    <div className="card-body p-3 md:p-4">
                       {ex.icon}
-                      <h4 className="font-medium">{ex.title}</h4>
+                      <h4 className="font-medium text-xs md:text-sm">{ex.title}</h4>
                       <p className="text-xs text-base-content/60">{ex.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
               <button className="btn btn-link btn-sm w-full mt-3 text-primary">
-                More Exercises <ArrowRight className="w-4 h-4 ml-1" />
+                More Exercises <ArrowRight className="w-3 h-3 md:w-4 md:h-4 ml-1" />
               </button>
             </section>
           </aside>
 
-          {/* Main Content */}
-          <main className="flex-1 col-span-6 overflow-y-auto scrollbar scrollbar-none p-6 no-scrollbar">
-            {/* Category Filters */}
-            <section className="flex gap-2 mb-6 overflow-x-auto no-scrollbar pb-2">
-              <button className="btn btn-primary btn-sm">All</button>
-              <Link to='/chat' className="btn btn-outline btn-sm">Talk to Friend</Link>
-              <Link to='/breath' className="btn btn-outline btn-sm">Meditation</Link>
-              <Link to='/note' className="btn btn-outline btn-sm">Journaling</Link>
-              <Link to='/music' className="btn btn-outline btn-sm">Music</Link>
-              <Link to='/detect-emotion' className="btn btn-outline btn-sm">Analyze Emotion</Link>
-              <Link to='/location' className="btn btn-outline btn-sm">Locate Friends</Link>
+          {/* Main Content - RESPONSIVE */}
+          <main className="flex-1 lg:col-span-6 overflow-y-auto scrollbar scrollbar-none p-3 md:p-4 lg:p-6 no-scrollbar w-full ml-16 md:ml-20 lg:ml-0">
+            {/* Category Filters - RESPONSIVE */}
+            <section className="flex gap-2 mb-4 md:mb-6 overflow-x-auto no-scrollbar pb-2">
+              <button className="btn btn-primary btn-xs md:btn-sm whitespace-nowrap">All</button>
+              <Link to='/chat' className="btn btn-outline btn-xs md:btn-sm whitespace-nowrap">Talk to Friend</Link>
+              <Link to='/breath' className="btn btn-outline btn-xs md:btn-sm whitespace-nowrap">Meditation</Link>
+              <Link to='/note' className="btn btn-outline btn-xs md:btn-sm whitespace-nowrap">Journaling</Link>
+              <Link to='/music' className="btn btn-outline btn-xs md:btn-sm whitespace-nowrap">Music</Link>
+              <Link to='/detect-emotion' className="btn btn-outline btn-xs md:btn-sm whitespace-nowrap">Analyze Emotion</Link>
+              <Link to='/location' className="btn btn-outline btn-xs md:btn-sm whitespace-nowrap">Locate Friends</Link>
             </section>
 
-            {/* Weekly Mood Tracker */}
+            {/* Weekly Mood Tracker - RESPONSIVE */}
             <div className="card bg-base-100 shadow-xl mb-3">
-                      <div className="card-body ">
-                        <h3 className="card-title text-xl mb-4 flex items-center gap-2">
-                          <History className="w-5 h-5" />
+                      <div className="card-body p-3 md:p-4 lg:p-6">
+                        <h3 className="card-title text-base md:text-lg xl:text-xl mb-3 md:mb-4 flex items-center gap-2">
+                          <History className="w-4 h-4 md:w-5 md:h-5" />
                           Mood History
                         </h3>
                         
-                        <div className="grid grid-cols-7 gap-4">
+                        <div className="grid grid-cols-7 gap-1 md:gap-2 lg:gap-4">
                           {weekdays.map((day) => {
                             const rawEmotion = weekdayMap[day];
                             const emotion = normalizeEmotion(rawEmotion);
@@ -582,16 +617,17 @@ React.useEffect(() => {
                             const hasData = emotion !== null && emotion !== undefined;
                             
                             return (
-                              <div key={day} className={`flex flex-col items-center gap-2 p-3 rounded-lg transition-colors ${
+                              <div key={day} className={`flex flex-col items-center gap-1 md:gap-2 p-1.5 md:p-2 lg:p-3 rounded-lg transition-colors ${
                                 hasData ? 'bg-base-200 hover:bg-base-300' : 'bg-base-100 border-2 border-dashed border-base-300'
                               }`}>
-                                <div className={`text-3xl mb-1 ${!hasData ? 'opacity-30' : ''}`}>
+                                <div className={`text-xl md:text-2xl lg:text-3xl mb-0.5 md:mb-1 ${!hasData ? 'opacity-30' : ''}`}>
                                   {hasData ? emoji : '😐'}
                                 </div>
-                                <span className="text-xs font-medium text-base-content/70">{day.slice(0, 3)}</span>
-                                <span className={`text-xs text-center capitalize px-2 py-1 rounded-full text-base-content/80 ${
+                                <span className="text-xs font-medium text-base-content/70 hidden sm:inline">{day.slice(0, 3)}</span>
+                                <span className="text-xs font-medium text-base-content/70 sm:hidden">{day.slice(0, 1)}</span>
+                                <span className={`text-xs text-center capitalize px-1 md:px-2 py-0.5 md:py-1 rounded-full text-base-content/80 ${
                                   hasData ? 'bg-base-100' : 'bg-base-200 text-base-content/50'
-                                }`}>
+                                } hidden md:inline-block`}>
                                   {hasData ? emotion : 'No data'}
                                 </span>
                               </div>
@@ -602,38 +638,38 @@ React.useEffect(() => {
                     </div>
             
 
-            <div className="space-y-4 max-w-6xl mx-auto">
-  {/* Top Row - Bar Chart */}
+            <div className="space-y-3 md:space-y-4 max-w-6xl mx-auto">
+  {/* Top Row - Bar Chart - RESPONSIVE */}
   <div className="w-full">
     <div className="card bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 shadow-xl border border-base-300/20">
-      <div className="card-body p-4">
-        <div className="flex items-center justify-between mb-3">
+      <div className="card-body p-3 md:p-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 gap-2">
           <div>
-            <h2 className="card-title text-lg mb-1 flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-primary" />
+            <h2 className="card-title text-sm md:text-base lg:text-lg mb-1 flex items-center gap-2">
+              <BarChart3 className="w-3 h-3 md:w-4 md:h-4 text-primary" />
               Weekly Mood Analysis
             </h2>
-            <p className="text-xs text-base-content/60">Positive and negative emotions breakdown</p>
+            <p className="text-xs text-base-content/60 hidden sm:block">Positive and negative emotions breakdown</p>
           </div>
           <div className="flex items-center gap-2">
             <div className="badge badge-outline badge-success gap-1 badge-xs">
-              <div className="w-1.5 h-1.5 bg-success rounded-full"></div>
+              <div className="w-1 h-1 md:w-1.5 md:h-1.5 bg-success rounded-full"></div>
               <span className="text-xs">Positive</span>
             </div>
             <div className="badge badge-outline badge-error gap-1 badge-xs">
-              <div className="w-1.5 h-1.5 bg-error rounded-full"></div>
+              <div className="w-1 h-1 md:w-1.5 md:h-1.5 bg-error rounded-full"></div>
               <span className="text-xs">Negative</span>
             </div>
           </div>
         </div>
 
-        <div className="relative h-36 bg-gradient-to-t from-base-200/30 to-transparent rounded-lg p-2">
-          <div className="flex items-end justify-between h-full px-1">
+        <div className="relative h-28 md:h-32 lg:h-36 bg-gradient-to-t from-base-200/30 to-transparent rounded-lg p-2">
+          <div className="flex items-end justify-between h-full px-0.5 md:px-1">
             {chartData.map((data, index) => (
-              <div key={index} className="flex flex-col items-center gap-1 flex-1 max-w-16">
-                <div className="flex flex-col items-center justify-end h-24 gap-0.5">
+              <div key={index} className="flex flex-col items-center gap-0.5 md:gap-1 flex-1 max-w-8 md:max-w-12 lg:max-w-16">
+                <div className="flex flex-col items-center justify-end h-20 md:h-24 gap-0.5">
                   <div
-                    className={`w-8 rounded-t transition-all duration-500 tooltip ${
+                    className={`w-4 md:w-6 lg:w-8 rounded-t transition-all duration-500 tooltip ${
                       data.hasData 
                         ? 'bg-gradient-to-t from-success to-success/80 hover:from-success/90 hover:to-success' 
                         : 'bg-base-300/50'
@@ -642,7 +678,7 @@ React.useEffect(() => {
                     data-tip={data.hasData ? `${data.emotion} - Positive: ${Math.round(data.positive)}%` : 'No data available'}
                   ></div>
                   <div
-                    className={`w-8 rounded-b transition-all duration-500 tooltip ${
+                    className={`w-4 md:w-6 lg:w-8 rounded-b transition-all duration-500 tooltip ${
                       data.hasData 
                         ? 'bg-gradient-to-b from-error to-error/80 hover:from-error/90 hover:to-error' 
                         : 'bg-base-300/50'
@@ -651,7 +687,7 @@ React.useEffect(() => {
                     data-tip={data.hasData ? `${data.emotion} - Negative: ${Math.round(data.negative)}%` : 'No data available'}
                   ></div>
                 </div>
-                <span className="text-xs text-base-content/60 font-medium">{data.date}</span>
+                <span className="text-xs text-base-content/60 font-medium hidden sm:inline">{data.date}</span>
               </div>
             ))}
           </div>
@@ -660,23 +696,23 @@ React.useEffect(() => {
     </div>
   </div>
 
-  {/* Bottom Row - Trend Chart and Suggestions Side by Side */}
-  <div className="flex flex-col lg:flex-row gap-4">
-    {/* Trend Line Chart - Takes up 60% on large screens */}
+  {/* Bottom Row - Trend Chart and Suggestions Side by Side - RESPONSIVE */}
+  <div className="flex flex-col lg:flex-row gap-3 md:gap-4">
+    {/* Trend Line Chart - Takes up 60% on large screens - RESPONSIVE */}
     <div className="flex-1 lg:flex-[3]">
       <div className="card bg-gradient-to-br from-secondary/10 via-accent/5 to-primary/10 shadow-xl border border-base-300/20">
-        <div className="card-body p-4">
+        <div className="card-body p-3 md:p-4">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h2 className="card-title text-lg mb-1 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-secondary" />
+              <h2 className="card-title text-sm md:text-base lg:text-lg mb-1 flex items-center gap-2">
+                <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-secondary" />
                 Mood Trends
               </h2>
-              <p className="text-xs text-base-content/60">Overall mood progression this week</p>
+              <p className="text-xs text-base-content/60 hidden sm:block">Overall mood progression this week</p>
             </div>
           </div>
 
-          <div className="relative h-32 bg-gradient-to-t from-base-200/30 to-transparent rounded-lg p-3">
+          <div className="relative h-24 md:h-28 lg:h-32 bg-gradient-to-t from-base-200/30 to-transparent rounded-lg p-2 md:p-3">
             {/* Y-axis labels */}
             <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-base-content/50 py-2">
               <span>10</span>
@@ -688,7 +724,7 @@ React.useEffect(() => {
             </div>
 
             {/* Chart area */}
-            <div className="ml-4 h-full relative">
+            <div className="ml-3 md:ml-4 h-full relative">
               <svg className="w-full h-full" viewBox="0 0 280 100" preserveAspectRatio="none">
                 {/* Grid lines */}
                 <defs>
@@ -745,9 +781,9 @@ React.useEffect(() => {
             </div>
 
             {/* X-axis labels */}
-            <div className="flex justify-between text-xs text-base-content/50 mt-2 ml-4">
+            <div className="flex justify-between text-xs text-base-content/50 mt-2 ml-3 md:ml-4 overflow-x-auto no-scrollbar">
               {chartData.map((data, index) => (
-                <span key={index} className="flex-1 text-center">
+                <span key={index} className="flex-1 text-center min-w-8">
                   {data.date}
                 </span>
               ))}
@@ -757,22 +793,22 @@ React.useEffect(() => {
       </div>
     </div>
 
-    {/* Recent Emotion Suggestions - Takes up 40% on large screens */}
+    {/* Recent Emotion Suggestions - Takes up 40% on large screens - RESPONSIVE */}
     <div className="flex-1 lg:flex-[2]">
       {recentEmotion && (
         <div className={`card bg-gradient-to-r ${getEmotionSuggestions(recentEmotion)?.color} shadow-xl`}>
-          <div className="card-body p-4">
-            <h2 className="card-title text-lg mb-3 flex items-center gap-2">
-              <span className="text-xl">{getEmotionEmoji(recentEmotion)}</span>
+          <div className="card-body p-3 md:p-4">
+            <h2 className="card-title text-sm md:text-base lg:text-lg mb-3 flex items-center gap-2">
+              <span className="text-lg md:text-xl">{getEmotionEmoji(recentEmotion)}</span>
               <span className="truncate">{getEmotionSuggestions(recentEmotion)?.title}</span>
             </h2>
             
             <div className="space-y-2">
               {getEmotionSuggestions(recentEmotion)?.items.slice(0, 3).map((item, index) => (
-                <div key={index} className="flex items-center gap-3 p-2 bg-base-100/50 hover:bg-base-100/70 transition-colors cursor-pointer rounded-lg">
-                  <div className="text-lg flex-shrink-0">{item.icon}</div>
+                <div key={index} className="flex items-center gap-2 md:gap-3 p-2 bg-base-100/50 hover:bg-base-100/70 transition-colors cursor-pointer rounded-lg">
+                  <div className="text-base md:text-lg flex-shrink-0">{item.icon}</div>
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-semibold text-sm text-base-content truncate">{item.title}</h3>
+                    <h3 className="font-semibold text-xs md:text-sm text-base-content truncate">{item.title}</h3>
                     <p className="text-xs text-base-content/70 line-clamp-1">{item.desc}</p>
                   </div>
                 </div>
@@ -788,13 +824,26 @@ React.useEffect(() => {
 
           </main>
 
-          {/* Right Sidebar */}
-          <aside className="col-span-3 bg-base-200 shadow-lg p-6 overflow-y-auto hidden lg:flex flex-col no-scrollbar">
-            {/* Calendar */}
+          {/* Right Sidebar - RESPONSIVE - Show on mobile when toggled */}
+          <aside className={`w-72 md:w-80 bg-base-200 shadow-lg p-4 md:p-6 overflow-y-auto no-scrollbar transition-transform duration-300 ${
+            isRightSidebarOpen ? 'translate-x-0' : 'translate-x-full'
+          } lg:translate-x-0 fixed lg:static top-0 right-0 h-full z-40 lg:z-auto lg:col-span-3`}>
+            
+            <div className="lg:hidden flex justify-between items-center mb-4">
+              <h2 className="text-base md:text-lg font-bold">Calendar & Events</h2>
+              <button 
+                className="btn btn-circle btn-ghost btn-sm"
+                onClick={() => setIsRightSidebarOpen(false)}
+              >
+                <X className="w-5 h-5 md:w-6 md:h-6" />
+              </button>
+            </div>
+
+            {/* Calendar - RESPONSIVE */}
             <section className="mb-6">
-              <h3 className="text-lg font-semibold text-primary mb-4">Calendar</h3>
+              <h3 className="text-base md:text-lg font-semibold text-primary mb-4">Calendar</h3>
               <div className="card bg-base-300 shadow">
-                <div className="card-body p-4">
+                <div className="card-body p-3 md:p-4">
                   <div className="flex justify-between items-center mb-4">
                     <button 
                       className="btn btn-circle btn-ghost btn-sm"
@@ -802,7 +851,7 @@ React.useEffect(() => {
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
-                    <h4 className="font-bold text-lg">
+                    <h4 className="font-bold text-sm md:text-base lg:text-lg">
                       {months[currentDate.getMonth()]} {currentDate.getFullYear()}
                     </h4>
                     <button 
@@ -812,16 +861,16 @@ React.useEffect(() => {
                       <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
-                  <div className="grid grid-cols-7 gap-1 text-center text-sm mb-2">
+                  <div className="grid grid-cols-7 gap-0.5 md:gap-1 text-center text-xs mb-2">
                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                      <div key={day} className="font-medium p-2">{day}</div>
+                      <div key={day} className="font-medium p-1 md:p-2">{day}</div>
                     ))}
                   </div>
-                  <div className="grid grid-cols-7 gap-1">
+                  <div className="grid grid-cols-7 gap-0.5 md:gap-1">
                     {generateCalendarDays().map((day, index) => (
                       <button
                         key={index}
-                        className={`btn btn-ghost btn-sm h-8 min-h-8 text-xs ${
+                        className={`btn btn-ghost btn-xs h-7 md:h-8 min-h-7 md:min-h-8 text-xs ${
                           day.isToday ? 'btn-primary' : 
                           !day.isCurrentMonth ? 'text-base-content/30' : ''
                         }`}
@@ -834,23 +883,23 @@ React.useEffect(() => {
               </div>
             </section>
 
-            {/* Appointments */}
+            {/* Appointments - RESPONSIVE */}
             <section>
-              <h3 className="text-lg font-semibold text-primary mb-4">Upcoming Appointments</h3>
-              <div className="space-y-3">
+              <h3 className="text-base md:text-lg font-semibold text-primary mb-4">Upcoming Appointments</h3>
+              <div className="space-y-2 md:space-y-3">
                 {appointments.map((appointment, index) => (
                   <div key={index} className="card bg-primary/10 border border-primary/20">
-                    <div className="card-body p-3 flex-row items-center">
-                      <div className="avatar placeholder mr-3">
-                        <div className="bg-primary text-primary-content rounded-full w-10">
+                    <div className="card-body p-2 md:p-3 flex-row items-center">
+                      <div className="avatar placeholder mr-2 md:mr-3">
+                        <div className="bg-primary text-primary-content rounded-full w-8 md:w-10">
                           <span className="text-xs">{appointment.avatar}</span>
                         </div>
                       </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium">{appointment.name}</h4>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-sm md:text-base truncate">{appointment.name}</h4>
                         <p className="text-xs text-base-content/60">{appointment.time}</p>
                       </div>
-                      <Video className="w-5 h-5 text-primary" />
+                      <Video className="w-4 h-4 md:w-5 md:h-5 text-primary flex-shrink-0" />
                     </div>
                   </div>
                 ))}
