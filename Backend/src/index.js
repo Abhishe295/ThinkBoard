@@ -18,7 +18,7 @@ dotenv.config();
 const PORT = process.env.PORT || 5001;
 // const __dirname = path.resolve();
 
-const allowedOrigins = ["http://localhost:5173", process.env.FRONTEND_URL ]
+const allowedOrigins = ["http://localhost:5173", process.env.FRONTEND_URL, ]
 
 app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
