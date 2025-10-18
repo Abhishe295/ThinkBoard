@@ -403,30 +403,34 @@ React.useEffect(() => {
     { name: 'Dr. Ketrina Vete', time: 'Tomorrow, 10:00AM', avatar: 'KV' },
     { name: 'Dr. Mike Jack', time: 'Tomorrow, 11:00 AM', avatar: 'MJ' }
   ];
+
+  <p className="text-xs text-error absolute top-2 left-2 z-50">
+  {historyData?.daily_summary ? '✅ Data loaded' : '❌ No daily summary'}
+</p>
    
-  if (!historyData || !historyData.daily_summary) {
-  return (
-      <div className="min-h-screen bg-base-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="relative mb-8">
-            <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-r from-primary to-secondary opacity-20 animate-pulse"></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-            </div>
-          </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
-            MindWell
-          </h1>
-          <div className="flex items-center justify-center gap-2 opacity-60">
-            <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-            <div className="w-2 h-2 bg-secondary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-            <div className="w-2 h-2 bg-accent rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-          </div>
-          <p className="mt-4 opacity-60">Loading your creative workspace...</p>
-        </div>
-      </div>
-    )
-}
+//   if (!historyData || !historyData.daily_summary) {
+//   return (
+//       <div className="min-h-screen bg-base-100 flex items-center justify-center">
+//         <div className="text-center">
+//           <div className="relative mb-8">
+//             <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-r from-primary to-secondary opacity-20 animate-pulse"></div>
+//             <div className="absolute inset-0 flex items-center justify-center">
+//               <Loader2 className="w-8 h-8 text-primary animate-spin" />
+//             </div>
+//           </div>
+//           <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
+//             MindWell
+//           </h1>
+//           <div className="flex items-center justify-center gap-2 opacity-60">
+//             <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+//             <div className="w-2 h-2 bg-secondary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+//             <div className="w-2 h-2 bg-accent rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+//           </div>
+//           <p className="mt-4 opacity-60">Loading your creative workspace...</p>
+//         </div>
+//       </div>
+//     )
+// }
 
 
   const weekdayMap = getWeekdayMap(historyData?.daily_summary)
