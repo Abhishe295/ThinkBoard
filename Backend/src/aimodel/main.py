@@ -10,6 +10,8 @@ from fastapi import Form, File, UploadFile
 from starlette.requests import Request
 import tempfile
 from fastapi.middleware.cors import CORSMiddleware
+from camera.cameraMain import predict_emotion
+import os
 
 app = FastAPI()
 
@@ -44,12 +46,17 @@ class FormRequest(BaseModel):
 
 @app.post("/detect-emotion/image")
 async def detect_emotion_image(user_id: str = Form(...), file: UploadFile = File(...)):
-    contents = await file.read()
-    np_arr = np.frombuffer(contents, np.uint8)
-    img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+    # Save uploaded image to a temp file
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
+        temp_file.write(await file.read())
+        temp_file_path = temp_file.name
 
-    # Simulated emotion detection
-    detected_emotion = np.random.choice(["happy", "sad", "angry", "neutral"])
+    # Run actual emotion detection
+    try:
+        detected_emotion = predict_emotion(temp_file_path)
+    except Exception as e:
+        print("Prediction error:", e)
+        detected_emotion = "unknown"
 
     entry = {
         "emotion": detected_emotion,
@@ -59,11 +66,14 @@ async def detect_emotion_image(user_id: str = Form(...), file: UploadFile = File
     print(entry)
     user_emotion_history.setdefault(user_id, []).append(entry)
 
+    os.remove(temp_file_path)
+
     return {
         "user_id": user_id,
         "detected_emotion": detected_emotion,
         "history": user_emotion_history[user_id]
     }
+
 
 
 
