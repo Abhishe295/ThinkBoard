@@ -4,3 +4,4 @@ numpy
 librosa
 opencv-python-headless
 python-multipart
+starlette

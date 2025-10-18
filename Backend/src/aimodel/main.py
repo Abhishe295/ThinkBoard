@@ -9,8 +9,20 @@ from datetime import datetime, timedelta
 from fastapi import Form, File, UploadFile
 from starlette.requests import Request
 import tempfile
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://mindwell-three.vercel.app",
+        "https://backend-8nby.onrender.com"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # In-memory store for user emotions
 user_emotion_history = {}
@@ -29,42 +41,6 @@ class FormRequest(BaseModel):
     user_id: str
     phq9: list[int]
     gad7: list[int]
-
-
-# -------------------------------
-# Camera-based emotion detection
-# -------------------------------
-# @app.post("/detect-emotion/camera")
-# def detect_emotion_camera(req: CameraRequest):
-#     user_id = req.user_id
-
-#     cap = cv2.VideoCapture(0)  # Open webcam
-#     if not cap.isOpened():
-#         return JSONResponse(content={"error": "Camera not accessible"}, status_code=500)
-
-#     emotions = ["happy", "sad", "angry", "neutral"]
-#     detected_emotion = "neutral"
-#     start_time = datetime.now()
-
-#     while (datetime.now() - start_time).seconds < 5:
-#         ret, frame = cap.read()
-#         if not ret:
-#             break
-#         detected_emotion = np.random.choice(emotions)
-
-#     cap.release()
-
-#     entry = {
-#         "emotion": detected_emotion,
-#         "timestamp": datetime.now().isoformat(),
-#         "source": "camera"
-#     }
-#     user_emotion_history.setdefault(user_id, []).append(entry)
-#     print(user_emotion_history)
-
-#     return {"user_id": user_id, "detected_emotion": detected_emotion, "history": user_emotion_history[user_id]}
-
-
 
 @app.post("/detect-emotion/image")
 async def detect_emotion_image(user_id: str = Form(...), file: UploadFile = File(...)):
