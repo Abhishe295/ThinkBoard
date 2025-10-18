@@ -474,30 +474,30 @@ React.useEffect(() => {
         )}
 
         {/* Left Mini Sidebar - RESPONSIVE */}
-        <nav className="w-16 md:w-20 bg-base-200 shadow-lg flex flex-col items-center py-4 md:py-6 fixed left-0 top-0 h-full z-30">
+        <nav className="w-12 md:w-20 bg-base-200 shadow-lg flex flex-col items-center py-4 md:py-6 fixed left-0 top-0 h-full z-30">
           <div className="flex flex-col space-y-3 md:space-y-5 flex-grow">
             <button className="btn btn-circle btn-primary btn-sm md:btn-md">
-              <Home className="w-4 h-4 md:w-6 md:h-6" />
+              <Home className="size-5 md:w-6 md:h-6" />
             </button>
             <Link to='/AI' className="btn btn-circle btn-ghost btn-sm md:btn-md">
-              <Bot className="w-4 h-4 md:w-6 md:h-6" />
+              <Bot className="size-6 md:w-6 md:h-6" />
             </Link>
             <Link to='/chat' className="btn btn-circle btn-ghost btn-sm md:btn-md">
-              <MessageCircle className="w-4 h-4 md:w-6 md:h-6" />
+              <MessageCircle className="size-6 md:w-6 md:h-6" />
             </Link>
           </div>
           <div className="flex flex-col space-y-3 md:space-y-5 mt-auto">
             <button className="btn btn-circle btn-ghost btn-sm md:btn-md">
-              <HelpCircle className="w-4 h-4 md:w-6 md:h-6" />
+              <HelpCircle className="size-6 md:w-6 md:h-6" />
             </button>
             <button onClick={logout} className="btn btn-circle btn-ghost btn-sm md:btn-md">
-              {logoutLoading ? <LoaderIcon className="animate-spin w-3 h-3 md:w-4 md:h-4" />: <LogOut className="w-4 h-4 md:w-6 md:h-6" />}
+              {logoutLoading ? <LoaderIcon className="animate-spin w-3 h-3 md:w-4 md:h-4" />: <LogOut className="size-6 md:w-6 md:h-6" />}
             </button>
           </div>
         </nav>
 
         {/* Top Navbar - RESPONSIVE */}
-        <div className="fixed top-0 left-16 md:left-20 right-0 z-20 bg-base-200 shadow-lg lg:hidden">
+        <div className="fixed top-0 left-12 md:left-20 right-0 z-20 bg-base-200 shadow-lg lg:hidden">
           <div className="navbar px-2 md:px-4">
             <div className="flex-1">
               <button 
@@ -601,7 +601,7 @@ React.useEffect(() => {
           </aside>
 
           {/* Main Content - RESPONSIVE */}
-          <main className="flex-1 lg:col-span-6 overflow-y-auto scrollbar scrollbar-none p-1 md:p-4 no-scrollbar w-full ml-16 md:ml-20 lg:ml-0">
+          <main className="flex-1 lg:col-span-6 overflow-y-auto scrollbar scrollbar-none p-1 md:p-4 no-scrollbar w-full ml-12 md:ml-20 lg:ml-0">
             {/* Category Filters - RESPONSIVE */}
             <section className="flex gap-2 mb-4 md:mb-6 overflow-x-auto no-scrollbar pb-2">
               <button className="btn btn-primary btn-xs md:btn-sm whitespace-nowrap">All</button>
