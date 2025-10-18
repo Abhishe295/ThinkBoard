@@ -42,7 +42,11 @@ const HomePage = () => {
   const [imageUrl, setImageUrl] = useState('');
   const [uploading, setUploading] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
-  const [historyData, setHistoryData] = useState(null);
+  const [historyData, setHistoryData] = useState({
+    daily_summary: {},
+    weekly_summary: {},
+    monthly_summary: {}
+  });
   const [historyError, setHistoryError] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
 
@@ -257,6 +261,12 @@ React.useEffect(() => {
 
       if (!data.message) {
         setHistoryData(data);
+      }else{
+        setHistoryData({
+          daily_summary: {},
+          weekly_summary: {},
+          monthly_summary: {}
+        })
       }
     } catch (error) {
       console.error("Error fetching emotion history:", error.message);
@@ -406,10 +416,7 @@ React.useEffect(() => {
     { name: 'Dr. Mike Jack', time: 'Tomorrow, 11:00 AM', avatar: 'MJ' }
   ];
    
-  if (
-    // !historyData || !historyData.daily_summary
-    historyLoading
-  ) {
+  if (historyLoading && (!historyData || Object.keys(historyData.daily_summary || {}).length===0)) {
   return (
       <div className="min-h-screen bg-base-100 flex items-center justify-center">
         <div className="text-center">
