@@ -43,6 +43,7 @@ const HomePage = () => {
   const [uploading, setUploading] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
   const [historyData, setHistoryData] = useState(null);
+  const [historyError, setHistoryError] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
 
 
@@ -259,6 +260,7 @@ React.useEffect(() => {
       }
     } catch (error) {
       console.error("Error fetching emotion history:", error.message);
+      setHistoryError(true);
     } finally {
       setHistoryLoading(false);
     }
@@ -404,7 +406,10 @@ React.useEffect(() => {
     { name: 'Dr. Mike Jack', time: 'Tomorrow, 11:00 AM', avatar: 'MJ' }
   ];
    
-  if (!historyData || !historyData.daily_summary) {
+  if (
+    // !historyData || !historyData.daily_summary
+    historyLoading
+  ) {
   return (
       <div className="min-h-screen bg-base-100 flex items-center justify-center">
         <div className="text-center">
@@ -429,8 +434,8 @@ React.useEffect(() => {
 }
 
 
-  const weekdayMap = getWeekdayMap(historyData?.daily_summary)
-  const chartData = generateChartData(historyData.daily_summary);
+  const weekdayMap = getWeekdayMap(historyData?.daily_summary || {})
+  const chartData = generateChartData(historyData.daily_summary || {});
   const weeklyEmotion = historyData.weekly_summary
   ? normalizeEmotion(getLatestEmotion(historyData.weekly_summary))
   : null;
