@@ -30,6 +30,11 @@ backend/src/aimodel/camera/images/train/
 backend/src/aimodel/camera/images/test/
 backend/src/aimodel/camera/images/validation/
 
+# Ignore voice dataset globally
+voices/
+**/voices/
+
+
 
 
 

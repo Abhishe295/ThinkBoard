@@ -1,17 +1,18 @@
-from fastapi import FastAPI
+from fastapi import FastAPI,UploadFile,File,Form
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-import cv2
 import numpy as np
 import librosa
+import subprocess
 from collections import Counter
 from datetime import datetime, timedelta
 from fastapi import Form, File, UploadFile
 from starlette.requests import Request
 import tempfile
 from fastapi.middleware.cors import CORSMiddleware
-from camera.cameraMain import predict_emotion
+from camera.cameraMain import predict_emotion_camera
 import os
+from speech.voiceMain import predict_emotion_voice
 
 app = FastAPI()
 
@@ -53,7 +54,7 @@ async def detect_emotion_image(user_id: str = Form(...), file: UploadFile = File
 
     # Run actual emotion detection
     try:
-        detected_emotion = predict_emotion(temp_file_path)
+        detected_emotion = predict_emotion_camera(temp_file_path)
     except Exception as e:
         print("Prediction error:", e)
         detected_emotion = "unknown"
@@ -80,33 +81,43 @@ async def detect_emotion_image(user_id: str = Form(...), file: UploadFile = File
 # -------------------------------
 # Voice-based emotion detection
 # -------------------------------
+FFMPEG_PATH = r"C:\ffmpeg\ffmpeg-2025-10-16-git-cd4b01707d-full_build\bin\ffmpeg.exe"
 @app.post("/detect-emotion/voice")
 async def detect_emotion_voice(
-    user_id: str = Form(...), 
+    user_id: str = Form(...),
     file: UploadFile = File(...)
 ):
     if not file:
         return JSONResponse(content={"error": "No file uploaded"}, status_code=400)
-    
 
     try:
-        print("Got user_id:", user_id)
-        print("Got file:", file.filename, file.content_type)
-
         contents = await file.read()
-        # librosa requires a temp file
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
-            tmp.write(contents)
-            tmp_path = tmp.name
 
-        y, sr = librosa.load(tmp_path, sr=None)
-        mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
-        mfcc_mean = np.mean(mfcc, axis=1)
+        # Save uploaded file temporarily
+# Save uploaded audio (whatever type) to a temp file
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as tmp_in:
+            tmp_in.write(contents)
+            tmp_input = tmp_in.name
 
-        emotions = ["happy", "sad", "angry", "neutral"]
-        detected_emotion = np.random.choice(emotions)
+        # Create a *different* path for converted wav output
+        tmp_output = tmp_input.replace(".webm", "_converted.wav")
+
+        # Convert input → proper mono 22kHz wav
+        subprocess.run([
+            FFMPEG_PATH, "-v","error", "-i", tmp_input, "-ar", "22050", "-ac", "1", tmp_output
+        ], check=True)
+
+        # Now feed the converted file to your model
+        detected_emotion = predict_emotion_voice(tmp_output)
+
+        # Cleanup temp files
+        os.remove(tmp_input)
+        os.remove(tmp_output)
+
 
     except Exception as e:
+        import traceback
+        print("ERROR in /detect-emotion/voice:", traceback.format_exc())
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
     entry = {
@@ -120,8 +131,6 @@ async def detect_emotion_voice(
         "user_id": user_id,
         "detected_emotion": detected_emotion,
         "history": user_emotion_history[user_id]
-
-
     }
 # -------------------------------
 # Form-based emotion detection

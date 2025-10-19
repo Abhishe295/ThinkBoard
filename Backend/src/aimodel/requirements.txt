@@ -2,12 +2,12 @@ fastapi
 uvicorn
 numpy
 librosa
+resampy
 opencv-python-headless
 python-multipart
 starlette
 tensorflow
 keras
 pandas
-numpy
 tqdm
 scikit-learn

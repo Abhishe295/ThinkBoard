@@ -20,7 +20,7 @@ def preprocess_image(image_path):
     feature = img_to_array(img).reshape(1, 48, 48, 1)
     return feature / 255.0
 
-def predict_emotion(image_path):
+def predict_emotion_camera(image_path):
     img = preprocess_image(image_path)
     prediction = model.predict(img)
     print("prob",prediction)

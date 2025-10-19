@@ -96,45 +96,25 @@ const HomePage = () => {
     }
   };
 
-  const EMOTION_EMOJIS = {
+const EMOTION_CODES = {
+  0: 'angry',
+  1:'disgust',
+  2: 'fear',
+  3: 'happy',
+  4: 'neutral',
+  5: 'sad',
+  6: 'surprise'
+}
+
+// Emoji mapping for emotions
+const EMOTION_EMOJIS = {
   'happy': '😊',
-  'joy': '😄',
-  'excited': '🤩',
-  'content': '😌',
-  'calm': '😇',
   'neutral': '😐',
   'sad': '😢',
   'angry': '😠',
-  'frustrated': '😤',
-  'anxious': '😰',
-  'worried': '😟',
-  'depressed': '😞',
   'fear': '😨',
   'disgust': '🤢',
   'surprise': '😲',
-  'confused': '😕',
-  'tired': '😴',
-  'stressed': '😣'
-};
-
-const EMOTION_CODES = {
-  0: 'neutral',
-  1: 'happy',
-  2: 'sad',
-  3: 'angry',
-  4: 'fear',
-  5: 'surprise',
-  6: 'disgust',
-  7: 'excited',
-  8: 'frustrated',
-  9: 'anxious',
-  10: 'worried',
-  11: 'depressed',
-  12: 'content',
-  13: 'calm',
-  14: 'confused',
-  15: 'tired',
-  16: 'stressed'
 };
 
 const getEmotionSuggestions = (emotion) => {
@@ -143,26 +123,6 @@ const getEmotionSuggestions = (emotion) => {
     
     const suggestions = {
       happy: {
-        title: "Keep the Positivity Flowing! 😊",
-        color: "from-green-100 to-emerald-100",
-        items: [
-          { icon: "🎵", title: "Music", desc: "Create or share your happy playlist with friends" },
-          { icon: "📝", title: "Gratitude Journal", desc: "Write down 3 things you're grateful for today" },
-          { icon: "🌟", title: "Spread Joy", desc: "Join group activities or chat with other positive users" },
-          { icon: "📞", title: "Connect", desc: "Share your good mood with friends and family" }
-        ]
-      },
-      joy: {
-        title: "Keep the Positivity Flowing! 😊",
-        color: "from-green-100 to-emerald-100",
-        items: [
-          { icon: "🎵", title: "Music", desc: "Create or share your happy playlist with friends" },
-          { icon: "📝", title: "Gratitude Journal", desc: "Write down 3 things you're grateful for today" },
-          { icon: "🌟", title: "Spread Joy", desc: "Join group activities or chat with other positive users" },
-          { icon: "📞", title: "Connect", desc: "Share your good mood with friends and family" }
-        ]
-      },
-      excited: {
         title: "Keep the Positivity Flowing! 😊",
         color: "from-green-100 to-emerald-100",
         items: [
@@ -194,17 +154,6 @@ const getEmotionSuggestions = (emotion) => {
           { icon: "🤔", title: "Pause & Reflect", desc: "Take time to cool down before reaching out to others" }
         ]
       },
-      frustrated: {
-        title: "Channel Your Energy Safely 🔴",
-        color: "from-red-100 to-rose-100",
-        items: [
-          { icon: "🎵", title: "Release Music", desc: "Try energetic workout beats or calming instrumentals" },
-          { icon: "🫁", title: "Box Breathing", desc: "Use breathing techniques to cool down anger" },
-          { icon: "📝", title: "Anger Journal", desc: "Write what triggered you, then reframe it constructively" },
-          { icon: "⚡", title: "Physical Release", desc: "Consider a walk, workout, or physical activity" },
-          { icon: "🤔", title: "Pause & Reflect", desc: "Take time to cool down before reaching out to others" }
-        ]
-      },
       neutral: {
         title: "Turn Stability into Productivity ⚪",
         color: "from-gray-100 to-slate-100",
@@ -215,26 +164,37 @@ const getEmotionSuggestions = (emotion) => {
           { icon: "📞", title: "Casual Connection", desc: "Reach out to friends for light conversation" }
         ]
       },
-      anxious: {
-        title: "Find Your Calm 💙",
-        color: "from-blue-100 to-indigo-100",
+      disgust: {
+        title: "Cleanse Your Space & Mind 🧼",
+        color: "from-lime-100 to-green-200",
         items: [
-          { icon: "🫁", title: "Deep Breathing", desc: "Practice 4-7-8 breathing or guided meditation" },
-          { icon: "🎵", title: "Calming Sounds", desc: "Try nature sounds, soft music, or meditation tracks" },
-          { icon: "📝", title: "Worry Journal", desc: "Write down your concerns to externalize them" },
-          { icon: "🌱", title: "Grounding", desc: "Use 5-4-3-2-1 technique (5 things you see, 4 you hear, etc.)" },
-          { icon: "📞", title: "Support", desc: "Consider calling a trusted friend or counselor" }
+          { icon: "🧽", title: "Declutter", desc: "Clean your room or workspace to refresh your environment" },
+          { icon: "📝", title: "Vent Safely", desc: "Write down what’s bothering you and toss it out" },
+          { icon: "🌿", title: "Nature Reset", desc: "Step outside for fresh air and a change of scenery" },
+          { icon: "🎵", title: "Mood Shift Music", desc: "Play something uplifting or cleansing" },
+          { icon: "📞", title: "Talk It Out", desc: "Share your thoughts with someone you trust" }
         ]
       },
-      worried: {
-        title: "Find Your Calm 💙",
-        color: "from-blue-100 to-indigo-100",
+      fear: {
+        title: "Find Calm & Courage 🛡️",
+        color: "from-indigo-100 to-purple-100",
         items: [
-          { icon: "🫁", title: "Deep Breathing", desc: "Practice 4-7-8 breathing or guided meditation" },
-          { icon: "🎵", title: "Calming Sounds", desc: "Try nature sounds, soft music, or meditation tracks" },
-          { icon: "📝", title: "Worry Journal", desc: "Write down your concerns to externalize them" },
-          { icon: "🌱", title: "Grounding", desc: "Use 5-4-3-2-1 technique (5 things you see, 4 you hear, etc.)" },
-          { icon: "📞", title: "Support", desc: "Consider calling a trusted friend or counselor" }
+          { icon: "🫁", title: "Grounding Exercise", desc: "Try the 5-4-3-2-1 technique to stay present" },
+          { icon: "📝", title: "Fear Journal", desc: "Write down your fears and challenge them logically" },
+          { icon: "🎵", title: "Soothing Sounds", desc: "Play ambient or nature sounds to calm your nerves" },
+          { icon: "🧘", title: "Mindfulness", desc: "Try a short guided meditation or yoga stretch" },
+          { icon: "📞", title: "Safe Connection", desc: "Reach out to someone who makes you feel secure" }
+        ]
+      },
+      surprise: {
+        title: "Embrace the Unexpected 🎉",
+        color: "from-yellow-100 to-orange-100",
+        items: [
+          { icon: "🎁", title: "Celebrate Spontaneity", desc: "Do something fun or spontaneous today" },
+          { icon: "📝", title: "Surprise Journal", desc: "Reflect on what surprised you and how it made you feel" },
+          { icon: "🎵", title: "Playful Music", desc: "Try upbeat or quirky tunes to match the mood" },
+          { icon: "📞", title: "Share the Moment", desc: "Tell a friend about your surprise" },
+          { icon: "🗺️", title: "Explore Nearby", desc: "Visit a new place or try a new activity" }
         ]
       }
     };
@@ -334,34 +294,52 @@ React.useEffect(() => {
     return dailySummary[sortedDates[0]];
   };
 
-  const generateChartData = (dailySummary = {}) => {
+const generateChartData = (dailySummary) => {
+  // Define emotion score mappings (0-100 scale)
+  const emotionScores = {
+    'happy': { positive: 85, negative: 15 },
+    'surprise': { positive: 70, negative: 30 },
+    'neutral': { positive: 50, negative: 50 },
+    'sad': { positive: 20, negative: 75 },
+    'angry': { positive: 15, negative: 80 },
+    'fear': { positive: 10, negative: 85 },
+    'disgust': { positive: 15, negative: 70 }
+  };
+
   const chartData = [];
   const today = new Date();
-
+  
+  // Get the last 12 days of data
   for (let i = 11; i >= 0; i--) {
     const date = new Date(today);
     date.setDate(today.getDate() - i);
-    const dateStr = date.toISOString().split('T')[0];
-
-    let emotion =
-      dailySummary?.[dateStr] ??
-      dailySummary?.[date.toLocaleDateString("en-US")] ??
-      dailySummary?.[date.toLocaleDateString("en-CA")] ??
-      null;
-
+    const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+    
+    // Check multiple date formats for the emotion data
+    let emotion = dailySummary[dateStr];
+    if (emotion === undefined || emotion === null) {
+      const altDateStr1 = date.toLocaleDateString("en-US"); // M/D/YYYY
+      const altDateStr2 = date.toLocaleDateString("en-CA"); // YYYY-MM-DD
+      emotion = dailySummary[altDateStr1] || dailySummary[altDateStr2];
+    }
+    
+    // Normalize the emotion
     const normalizedEmotion = normalizeEmotion(emotion);
-    const isPositive = normalizedEmotion && ['happy', 'joy', 'excited', 'content', 'calm'].includes(normalizedEmotion);
-    const isNegative = normalizedEmotion && ['sad', 'angry', 'frustrated', 'anxious', 'worried', 'depressed'].includes(normalizedEmotion);
-
+    
+    // Get scores based on emotion, or use default for no data
+    const scores = normalizedEmotion 
+      ? emotionScores[normalizedEmotion] || { positive: 50, negative: 50 }
+      : { positive: 0, negative: 0 };
+    
     chartData.push({
       date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      positive: isPositive ? Math.random() * 60 + 40 : Math.random() * 20 + 10,
-      negative: isNegative ? Math.random() * 60 + 40 : Math.random() * 20 + 10,
+      positive: scores.positive,
+      negative: scores.negative,
       emotion: normalizedEmotion || null,
       hasData: !!normalizedEmotion
     });
   }
-
+  
   return chartData;
 };
 
@@ -724,7 +702,7 @@ React.useEffect(() => {
             </div>
           </div>
 
-          <div className="relative h-24 md:h-28 lg:h-32 bg-gradient-to-t from-base-200/30 to-transparent rounded-lg p-2 md:p-3">
+          <div className="relative h-24 md:h-28 lg:h-32 bg-gradient-to-t from-base-200/30 to-transparent rounded-lg  md:p-3">
             {/* Y-axis labels */}
             <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-base-content/50 py-2">
               <span>10</span>

@@ -8,29 +8,6 @@ import moment from 'moment';
 import _ from 'lodash';
 import path from 'path';
 
-
-
-// export const detectEmotionCamera= async(req,res)=>{
-//     try {
-//         const { userId } = req.body;
-//         const response = await axios.post(process.env.PYTHON_API + '/detect-emotion/camera',{user_id : userId});
-//         console.log(response.data);
-
-//         const data = response.data;
-//         await userModel.findByIdAndUpdate(userId, {$push: {emotionHistory: data.history[data.history.length-1]}
-//         });
-
-//         res.json(data);
-//     } catch (err) {
-//         console.error("Camera detection error:", err.response?.data || err.message);
-//   res.status(500).json({
-//     error: err.message,
-//     details: err.response?.data, // show Python error
-//   });
-        
-//     }
-// };
-
 const isProduction = process.env.NODE_ENV === 'production';
 
 const PYTHON_API = isProduction ? process.env.PYTHON_API_PROD : process.env.PYTHON_API_DEV;
@@ -94,6 +71,9 @@ export const detectEmotionFromImage = async (req, res) => {
 export const detectEmotionVoice = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+    
+    console.log("req.file:", req.file);
+    console.log("req.body:", req.body);
 
     const userId = req.body.userId || req.body.user_id;
 
@@ -182,7 +162,6 @@ export const detectEmotionForm = async (req, res) => {
 export const getEmotionHistory = async (req, res) => {
   try {
     const userId = req.params.userId;
-
     const user = await userModel.findById(userId);
     const history = user?.emotionHistory || [];
 
@@ -193,7 +172,7 @@ export const getEmotionHistory = async (req, res) => {
       });
     }
 
-    const cutoff = moment().subtract(30, 'days');
+    const cutoff = moment().subtract(30, "days");
     const recentHistory = history.filter(entry =>
       moment(entry.timestamp).isAfter(cutoff)
     );
@@ -205,37 +184,38 @@ export const getEmotionHistory = async (req, res) => {
       });
     }
 
+    // --- Helper to get top emotion safely ---
+    const getTopEmotion = (entries) => {
+      const counts = _.countBy(entries, "emotion");
+      const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+      return sorted.length > 0 ? sorted[0][0] : null;
+    };
+
     // --- DAILY SUMMARY ---
     const dailyGroups = _.groupBy(recentHistory, entry =>
-      moment(entry.timestamp).format('YYYY-MM-DD')
+      moment(entry.timestamp).format("YYYY-MM-DD")
     );
-    const daily_summary = _.mapValues(dailyGroups, entries =>
-      _.head(_.orderBy(_.countBy(entries, 'emotion'), null, 'desc'))
-    );
+    const daily_summary = _.mapValues(dailyGroups, getTopEmotion);
 
     // --- WEEKLY SUMMARY ---
     const weeklyGroups = _.groupBy(recentHistory, entry =>
       `${moment(entry.timestamp).isoWeekYear()}-W${moment(entry.timestamp).isoWeek()}`
     );
-    const weekly_summary = _.mapValues(weeklyGroups, entries =>
-      _.head(_.orderBy(_.countBy(entries, 'emotion'), null, 'desc'))
-    );
+    const weekly_summary = _.mapValues(weeklyGroups, getTopEmotion);
 
     // --- MONTHLY SUMMARY ---
     const monthlyGroups = _.groupBy(recentHistory, entry =>
-      moment(entry.timestamp).format('YYYY-MM')
+      moment(entry.timestamp).format("YYYY-MM")
     );
-    const monthly_summary = _.mapValues(monthlyGroups, entries =>
-      _.head(_.orderBy(_.countBy(entries, 'emotion'), null, 'desc'))
-    );
+    const monthly_summary = _.mapValues(monthlyGroups, getTopEmotion);
 
     // --- TOP EMOTIONS ---
-    const emotionCounts = _.countBy(recentHistory, 'emotion');
+    const emotionCounts = _.countBy(recentHistory, "emotion");
     const top_emotions_last_30_days = Object.entries(emotionCounts)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 2);
 
-    res.json({
+    return res.json({
       user_id: userId,
       daily_summary,
       weekly_summary,

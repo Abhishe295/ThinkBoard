@@ -1,12 +1,13 @@
 import express from 'express';
 import { detectEmotionForm, detectEmotionFromImage, detectEmotionVoice, getAvailableGenres, getEmotionHistory, getSpotifyRecommendations, getSpotifyToken, searchSpotifyTracks } from '../controllers/emotionController.js';
 import upload from '../middleware/upload.js';
+import uploadVoice from '../middleware/uploadVoice.js';
 
 
 const emotionRoutes = express.Router();
 
 // emotionRoutes.post("/camera", detectEmotionCamera);
-emotionRoutes.post("/voice", upload.single("file"), detectEmotionVoice);
+emotionRoutes.post("/voice", uploadVoice.single("file"), detectEmotionVoice);
 emotionRoutes.post('/form',detectEmotionForm);
 emotionRoutes.get("/history/:userId",  getEmotionHistory);
 emotionRoutes.get('/spotify-token',getSpotifyToken);
