@@ -81,12 +81,13 @@ async def detect_emotion_image(user_id: str = Form(...), file: UploadFile = File
 # -------------------------------
 # Voice-based emotion detection
 # -------------------------------
-FFMPEG_PATH = r"C:\ffmpeg\ffmpeg-2025-10-16-git-cd4b01707d-full_build\bin\ffmpeg.exe"
+
 @app.post("/detect-emotion/voice")
 async def detect_emotion_voice(
     user_id: str = Form(...),
-    file: UploadFile = File(...)
+    file: UploadFile = File(...)   
 ):
+    FFMPEG_PATH = r"C:\ffmpeg\ffmpeg-2025-10-16-git-cd4b01707d-full_build\bin\ffmpeg.exe"
     if not file:
         return JSONResponse(content={"error": "No file uploaded"}, status_code=400)
 
