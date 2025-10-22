@@ -21,7 +21,7 @@ const ensureDirectoryExists = (dirPath) => {
 
 export const detectEmotionFromImage = async (req, res) => {
   try {
-    const { user_id } = req.body;
+    const userId = req.body.userId || req.body.user_id;
     const imageUrl = req.file?.path; // this is a Cloudinary URL
 
     if (!imageUrl) {
@@ -44,7 +44,7 @@ export const detectEmotionFromImage = async (req, res) => {
 
     // Prepare formData for Python
     const formData = new FormData();
-    formData.append('user_id', user_id);
+    formData.append('user_id', userId);
     formData.append('file', fs.createReadStream(tempPath));
 
     const pythonResponse = await axios.post(
@@ -52,6 +52,14 @@ export const detectEmotionFromImage = async (req, res) => {
       formData,
       { headers: formData.getHeaders() }
     );
+
+    const data = pythonResponse.data
+
+    if (data?.history?.length > 0) {
+      await userModel.findByIdAndUpdate(userId, {
+        $push: { emotionHistory: data.history[data.history.length - 1] },
+      });
+    }
 
     // Cleanup
     try {

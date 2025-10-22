@@ -105,7 +105,7 @@ async def detect_emotion_voice(
 
         # Convert input → proper mono 22kHz wav
         subprocess.run([
-            FFMPEG_PATH, "-v","error", "-i", tmp_input, "-ar", "22050", "-ac", "1", tmp_output
+            "ffmpeg", "-v","error", "-i", tmp_input, "-ar", "22050", "-ac", "1", tmp_output
         ], check=True)
 
         # Now feed the converted file to your model
