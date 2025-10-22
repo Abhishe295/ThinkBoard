@@ -108,92 +108,99 @@ const CallPage = () => {
   };
 
   const createPeerConnection = async () => {
-    if (pcRef.current) return;
-    pcRef.current = new RTCPeerConnection(ICE_CONFIG);
+  if (pcRef.current) return;
+  pcRef.current = new RTCPeerConnection(ICE_CONFIG);
 
-    // attach local tracks if we already have them
-    if (localStreamRef.current) {
-      localStreamRef.current.getTracks().forEach((t) =>
-        pcRef.current.addTrack(t, localStreamRef.current)
-      );
-    }
-
-    // prepare remote stream object
-    remoteStreamRef.current = new MediaStream();
-
-    // attach remote stream to HTML elements (video + audio)
-    if (remoteVideoRef.current) remoteVideoRef.current.srcObject = remoteStreamRef.current;
-    if (remoteAudioRef.current) remoteAudioRef.current.srcObject = remoteStreamRef.current;
-
-    // pcRef.current.ontrack = (event) => {
-    //   // attach tracks to the remote MediaStream
-    //   try {
-    //     const [stream] = event.streams;
-    //     if (stream) {
-    //       stream.getTracks().forEach((t) => {
-    //         remoteStreamRef.current.addTrack(t);
-    //       });
-    //     } else {
-    //       event.track && remoteStreamRef.current.addTrack(event.track);
-    //     }
-    //     // ensure elements are updated
-    //     if (remoteVideoRef.current) remoteVideoRef.current.srcObject = remoteStreamRef.current;
-    //     if (remoteAudioRef.current) remoteAudioRef.current.srcObject = remoteStreamRef.current;
-    //   } catch (e) {
-    //     console.warn("ontrack error", e);
-    //   }
-    // };
-
-    pcRef.current.ontrack = (event) => {
-  const [stream] = event.streams;
-
-  if (stream) {
-    console.log("🎥 Remote stream received:", stream);
-    remoteStreamRef.current = stream;
-
-    if (remoteVideoRef.current) {
-      remoteVideoRef.current.srcObject = stream;
-    }
-
-    // Reactively mark video as on/off
-    const hasVideo = stream.getVideoTracks().some((track) => track.readyState === "live");
-    setRemoteHasVideo(hasVideo);
-
-    // Listen for later changes (like camera toggle)
-    stream.getVideoTracks().forEach((track) => {
-      track.onended = () => setRemoteHasVideo(false);
-      track.onmute = () => setRemoteHasVideo(false);
-      track.onunmute = () => setRemoteHasVideo(true);
-    });
+  // attach local tracks if we already have them
+  if (localStreamRef.current) {
+    localStreamRef.current.getTracks().forEach((t) =>
+      pcRef.current.addTrack(t, localStreamRef.current)
+    );
   }
-};
 
+  // ❌ REMOVE THESE LINES - Don't pre-create or pre-attach remote stream
+  // remoteStreamRef.current = new MediaStream();
+  // if (remoteVideoRef.current) remoteVideoRef.current.srcObject = remoteStreamRef.current;
+  // if (remoteAudioRef.current) remoteAudioRef.current.srcObject = remoteStreamRef.current;
 
-    pcRef.current.onicecandidate = (evt) => {
-      if (evt.candidate && peerId) {
-        // include from so backend can attribute
-        socket.emit("call:ice", { callId, to: peerId, from: userData._id, candidate: evt.candidate });
+  pcRef.current.ontrack = (event) => {
+    console.log("🎥 Track received:", event.track.kind, event.streams);
+    
+    const [stream] = event.streams;
+
+    if (stream) {
+      console.log("🎥 Remote stream received:", stream);
+      remoteStreamRef.current = stream;
+
+      if (remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = stream;
+        console.log("📺 Set remote video srcObject");
       }
-    };
-
-    pcRef.current.onconnectionstatechange = () => {
-      try {
-        const state = pcRef.current.connectionState;
-        if (state === "connected") {
-          setCallStatus("connected");
-          flushPendingCandidates();
-        } else if (state === "disconnected" || state === "closed" || state === "failed") {
-          // cleanup
-          closeCall();
-        }
-      } catch (e) {
-        console.warn("connectionstatechange error", e);
+      
+      if (remoteAudioRef.current) {
+        remoteAudioRef.current.srcObject = stream;
+        console.log("🔊 Set remote audio srcObject");
       }
-    };
 
-    // flush any queued candidates now that pc exists
-    await flushPendingCandidates();
+      // Check for video availability
+      const videoTracks = stream.getVideoTracks();
+      const hasVideo = videoTracks.some((track) => track.enabled && track.readyState === "live");
+      console.log("🎥 Has video:", hasVideo, "Tracks:", videoTracks.length);
+      setRemoteHasVideo(hasVideo);
+
+      // Listen for later changes (like camera toggle)
+      videoTracks.forEach((track) => {
+        track.onended = () => {
+          console.log("🎥 Video track ended");
+          setRemoteHasVideo(false);
+        };
+        track.onmute = () => {
+          console.log("🎥 Video track muted");
+          setRemoteHasVideo(false);
+        };
+        track.onunmute = () => {
+          console.log("🎥 Video track unmuted");
+          setRemoteHasVideo(true);
+        };
+      });
+    } else {
+      console.warn("⚠️ No stream in ontrack event");
+    }
   };
+
+  pcRef.current.onicecandidate = (evt) => {
+    if (evt.candidate && peerId) {
+      console.log("🧊 Sending ICE candidate");
+      socket.emit("call:ice", { callId, to: peerId, from: userData._id, candidate: evt.candidate });
+    } else if (!evt.candidate) {
+      console.log("🧊 ICE gathering complete");
+    }
+  };
+
+  pcRef.current.onconnectionstatechange = () => {
+    try {
+      const state = pcRef.current.connectionState;
+      console.log("🔌 Connection state:", state);
+      
+      if (state === "connected") {
+        setCallStatus("connected");
+        flushPendingCandidates();
+      } else if (state === "disconnected" || state === "closed" || state === "failed") {
+        console.log("❌ Connection closed/failed");
+        closeCall();
+      }
+    } catch (e) {
+      console.warn("connectionstatechange error", e);
+    }
+  };
+
+  pcRef.current.oniceconnectionstatechange = () => {
+    console.log("🧊 ICE connection state:", pcRef.current.iceConnectionState);
+  };
+
+  // flush any queued candidates now that pc exists
+  await flushPendingCandidates();
+};
 
   const startCall = async () => {
     setIsConnecting(true);
