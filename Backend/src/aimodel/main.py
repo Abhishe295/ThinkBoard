@@ -20,7 +20,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://mindwell-three.vercel.app",
-        "https://backend-8nby.onrender.com"
+        "https://backend-8nby.onrender.com",
+        "https://aimodel1-jq5d.onrender.com"
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -105,7 +106,7 @@ async def detect_emotion_voice(
 
         # Convert input → proper mono 22kHz wav
         subprocess.run([
-            "ffmpeg", "-v","error", "-i", tmp_input, "-ar", "22050", "-ac", "1", tmp_output
+            "./ffmpeg", "-v","error", "-i", tmp_input, "-ar", "22050", "-ac", "1", tmp_output
         ], check=True)
 
         # Now feed the converted file to your model
