@@ -5,8 +5,6 @@ import userModel from "../models/userModel.js";
 import bcrypt from 'bcryptjs';
 import { OAuth2Client } from "google-auth-library";
 
-
-
 export const register = async(req,res)=>{
     const {name,email,password} = req.body;
     if(!name || !email || !password){
